@@ -1,8 +1,10 @@
 # Hahing Service
 
-This is a Service that hash any type of file, from applications to documents and media to verify the integrity. 
+This is a Service that can hash any type of file, from applications to documents and media. Hashing a file results in a unique and irreversible identifier. If this identifier is registered in an immutable network, as a blockchain ledger, the owner of the file can prove at anytime afterwards that the file was not modified.
 
-The Service sign the hash to guarantee that document was hashed by this Service and send it to https://github.com/lacchain/credential-server to written down on blockchain   
+This hashing service signs the hash to guarantee that the file was hashed by itselft, and sends it to https://github.com/lacchain/credential-server to write it down in the LACChain blockchain network.   
+
+The Hashing Service and the [Credential Service](https://github.com/lacchain/credential-server) are being used for the notarizing tool named [LACChain Notarizer](http://notarizer.lacchain.net/), that you can use to register and verify the hash any file in the LACChain Blockchain Network for free. For any questions about the tool, you can also read the [LACChain Notarizer FAQ](https://medium.com/@lacchain.official/lacchain-notarizer-faq-6ae3dbb3441e).
 
 ## Prerequisites
 
