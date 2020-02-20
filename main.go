@@ -160,7 +160,7 @@ func getContactInformation(r *http.Request) ([]byte, error) {
 func enableCors(w *http.ResponseWriter) {
     (*w).Header().Set("Access-Control-Allow-Origin", "*")
     (*w).Header().Set("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS")
-    (*w).Header().Set("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Authorization, X-Requested-With")
+    (*w).Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Authorization, X-Requested-With")
 }
 
 func setupRoutes() {

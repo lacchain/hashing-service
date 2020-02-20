@@ -70,7 +70,7 @@
       First, you can upload a file of any kind and provide additional information as the title, the author and a desired expiration date. We also need you to provide your e-mail to send you the information to prove your file was registered. Then, by pressing the button “Generate Credential” you are generating a unique <a href="https://learncryptography.com/hash-functions/what-are-hash-functions/" target="_blank">hash</a> for your file and registering it in the <a href="http://35.245.15.167/" target="_blank">LACChain blockchain network</a>. The interface will display the information about the transaction and the
       block in which your hash was registered, as well as the verifiable credential that you can save to prove it to others. An e-mail will be also sent to you will this information.</br></br>
       Once your file has been registered, you or anyone you hava shared the credential with, can go to the tab “Verify Credential” to verify it is correct and valid, allowing you to proof that the hash of your file was registered in the LACChain network. In the tab “Verify Document &amp; Credential” anyone in possession of the file and the credential can also verify that the hash of that specific file is the one that appears in the credential, so was registered in LACChain. You can also use our <a href="http://35.245.15.167/" target="_blank">transaction explorer</a> to find your transaction in the blockchain!</br></br>
-For more detailed information about how this notarization service works, please read our Medium article. Please send any comments or suggestions to <a href="mailto:info@lacchain.net" target="_blank">info@lacchain.net</a>. Thank you!</p>
+For more detailed information about how this notarization service works, please read our <a href="https://learncryptography.com/hash-functions/what-are-hash-functions/" target="_blank">hash</a> for your file and registering it in the <a href="https://medium.com/@lacchain.official/lacchain-notarizer-faq-6ae3dbb3441e" target="_blank">Medium article</a>. Please send any comments or suggestions to <a href="mailto:info@lacchain.net" target="_blank">info@lacchain.net</a>. Thank you!</p>
       <br><br>
       <p>
         <a class="btn btn-primary" data-toggle="collapse" href="#generateCredential" role="button" aria-expanded="false" aria-controls="generateCredential" onClick="onOpenGenerateCredential();">Generate Credential</a>
@@ -97,7 +97,8 @@ For more detailed information about how this notarization service works, please 
                 </div>
 		<div class="form-group">
                     <label for="email">Email</label>
-                    <input type="text" class="form-control" id="email" name="email" />
+                    <input type="text" class="form-control" id="email" name="email" placeholder="Please enter your email"/>
+                    <span class="is-invalid text-danger" id="invalid_email">Email is invalid</span>
                 </div>
 
                 <div class="form-group">
@@ -120,6 +121,9 @@ For more detailed information about how this notarization service works, please 
                 <div id="dispCred">
                   <p>Your credential will be displayed here.</p>
                 </div>  
+              </div>
+              <button class="btn btn-light" id="submitSendEmail">send Email<i class="fa fa-file-text" style="color:green"></i></button>
+              <div id="validationEmail">
               </div>
             </div>
           </div>
@@ -174,8 +178,11 @@ For more detailed information about how this notarization service works, please 
       </div>
     </footer>
 
-<script>   
+<script>  
+    var credentialBackup = new Object(); 
     $(document).ready(function() {
+      $('#invalid_email').hide();
+      $('#submitSendEmail').hide();
 	   var d = new Date() 
 	   var currDay = d.getDate(); 
 	   var currMonth = d.getMonth();
@@ -221,6 +228,13 @@ For more detailed information about how this notarization service works, please 
                 'expirationDate':n  
             };
 	    
+      if(IsEmail(document.getElementById('email').value)==false){
+          $('#invalid_email').show();
+          return;
+      }
+
+      $('#invalid_email').hide();       
+
 	    var contact = {
 		'email': document.getElementById('email').value
 	    };
@@ -241,12 +255,22 @@ For more detailed information about how this notarization service works, please 
             xhr.setRequestHeader('Access-Control-Allow-Origin', '*')    
             xhr.onload = () => {
                 console.log(xhr.response[0].credentialData);
+                credentialBackup = xhr.response[0];
                 $("#dispCred").html("<div class='alert alert-success' role='alert'>Congratulations! Your file has been registered successfully. The hash was registered at "+xhr.response[0].metadata.timestamp+" in the transaction "+xhr.response[0].metadata.transaction+", that is in the block "+xhr.response[0].metadata.blockNumber+". Your credential will be valid until the expiration date "+xhr.response[0].credentialData.credentialSubject.expirationDate+". Your credential is the text below. Please copy it and save it in a txt file, or you can also download it from the email we just sent you.</div><p>"+JSON.stringify(xhr.response[0].credentialData)+"</p>");
+                $('#submitSendEmail').show();
             };
 
             xhr.send(formularioCrearDatos);
         });
 
+        function IsEmail(email) {
+          var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+          if(!regex.test(email)) {
+            return false;
+          }else{
+            return true;
+          }
+        }  
 
       function onOpenGenerateCredential() {
         $('#validateCredential').collapse('hide');
@@ -364,6 +388,43 @@ For more detailed information about how this notarization service works, please 
             };
             xhr.send(form);
         })
+
+        $("#submitSendEmail").click(function() {
+            console.log(credentialBackup);
+            if (credentialBackup == null) {
+                alert("Please generate a credential first");
+                return;
+            }
+
+            if(IsEmail(document.getElementById('email').value)==false){
+              $('#invalid_email').show();
+              return;
+            }
+
+            $('#invalid_email').hide();
+
+            credentialBackup.metadata.email = document.getElementById('email').value;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('post', 'http://35.237.177.17:8000/v1/credential/send');
+            xhr.responseType = 'json';
+            xhr.setRequestHeader('Authorization', 'Bearer auth-token-if-any')
+            xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
+            xhr.setRequestHeader('accept','application/json')
+            xhr.setRequestHeader('Content-Type','application/json')          
+            xhr.onload = () => {
+                console.log(xhr.response);
+                console.log(xhr.response.valid);
+                if (xhr.response.error.code === "200"){
+                    $("#validationEmail").html("<div class='alert alert-success' role='alert'>Email was sent</div>");
+                }else{
+                    $("#validationEmail").html("<div class='alert alert-danger' role='alert'>Email wasn't sent, retry again</div>");
+                }
+                    
+            };
+            console.log("valor:"+JSON.stringify(credentialBackup));        
+            xhr.send("["+JSON.stringify(credentialBackup)+"]");
+        })  
 
     </script>
   </body>
