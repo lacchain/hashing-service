@@ -15,7 +15,8 @@ import (
     "os"
     "io/ioutil"
     "net/http"
-    "github.com/rs/cors"
+    "github.com/gorilla/handlers"
+    "github.com/gorilla/mux"
     "encoding/json"
     "github.com/go-openapi/strfmt"
     lib "github.com/lacchain/hashing-service/lib"
@@ -23,16 +24,19 @@ import (
 )
 
 func main(){
-	setupRoutes()
+    router := mux.NewRouter()
+    router.HandleFunc("/upload", uploadFile).Methods("POST","OPTIONS")
+    router.HandleFunc("/validate", validateHash).Methods("POST","OPTIONS")
+    
+    headersOk := handlers.AllowedHeaders([]string{"Accept","Accept-Encoding","Accept-Language","Authorization","X-Requested-With","Content-Type","Origin","Access-Control-Request-Headers","Access-Control-Request-Method"})
+    originsOk := handlers.AllowedOrigins([]string{"*"})
+    methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
+
+    http.ListenAndServe(":9000", handlers.CORS(originsOk, headersOk, methodsOk)(router))
 }
 
 func validateHash(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
-    enableCors(&w)
-    if r.Method == "OPTIONS" {
-        w.WriteHeader(http.StatusOK)
-        return
-    }
 
     // Parse our multipart form, 10 << 20 specifies a maximum
     // upload of 10 MB files.
@@ -68,11 +72,6 @@ func validateHash(w http.ResponseWriter, r *http.Request) {
 
 func uploadFile(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
-    //enableCors(&w)
-    if r.Method == "OPTIONS" {
-        w.WriteHeader(http.StatusOK)
-        return
-    }
 
     // Parse our multipart form, 10 << 20 specifies a maximum
     // upload of 10 MB files.
@@ -156,31 +155,6 @@ func getContactInformation(r *http.Request) ([]byte, error) {
 	}
 
 	return contactInformation, nil
-}
-
-func enableCors(w *http.ResponseWriter) {
-    (*w).Header().Set("Access-Control-Allow-Origin", "*")
-    (*w).Header().Set("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS")
-    (*w).Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Access-Control-Allow-Headers, Access-Control-Allow-Origin, Authorization, X-Requested-With")
-}
-
-func setupRoutes() {
-    fmt.Println("Init Hashing Server")
-    mux := http.NewServeMux()
-    //http.HandleFunc("/upload", uploadFile)
-    //http.HandleFunc("/validate", validateHash)
-    //http.ListenAndServe(":9000", nil)
-    mux.HandleFunc("/upload", uploadFile)
-    mux.HandleFunc("/validate", validateHash)
-    handler := cors.New(cors.Options{
-        AllowedOrigins: []string{"*"},
-        AllowCredentials: true,
-        AllowedMethods: []string{"DELETE","POST","GET","OPTIONS"},
-        AllowedHeaders: []string{"Origin","Content-Type","Access-Control-Allow-Headers","Access-Control-Allow-Origin"},
-        // Enable Debugging for testing, consider disabling in production
-        Debug: false,
-    }).Handler(mux)
-    http.ListenAndServe(":9000", handler)
 }
 
 func createCredential(metadata *model.Metadata, contact *model.Contact)(string){

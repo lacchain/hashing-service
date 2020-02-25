@@ -250,9 +250,7 @@ For more detailed information about how this notarization service works, please 
        } */
             var xhr = new XMLHttpRequest();
             xhr.open('post', 'http://35.237.177.17:9000/upload');
-            xhr.responseType = 'json';
-            xhr.setRequestHeader('Authorization', 'Bearer auth-token-if-any')
-            xhr.setRequestHeader('Access-Control-Allow-Origin', '*')    
+            xhr.responseType = 'json';    
             xhr.onload = () => {
                 console.log(xhr.response[0].credentialData);
                 credentialBackup = xhr.response[0];
@@ -299,8 +297,6 @@ For more detailed information about how this notarization service works, please 
             var xhr = new XMLHttpRequest();
             xhr.open('post', 'http://35.237.177.17:8000/v1/credential/verify');
             xhr.responseType = 'json';
-            xhr.setRequestHeader('Authorization', 'Bearer auth-token-if-any')
-            xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
             xhr.setRequestHeader('accept','application/json')
             xhr.setRequestHeader('Content-Type','application/json')          
             xhr.onload = () => {
@@ -329,9 +325,7 @@ For more detailed information about how this notarization service works, please 
 
             var xhr = new XMLHttpRequest();
             xhr.open('post', 'http://35.237.177.17:9000/validate');
-            xhr.responseType = 'json';
-            xhr.setRequestHeader('Authorization', 'Bearer auth-token-if-any')
-            xhr.setRequestHeader('Access-Control-Allow-Origin', '*')    
+            xhr.responseType = 'json';    
             xhr.onload = () => {
                 console.log("hash:"+xhr.response.hash);
                 var credentialResponse = JSON.parse($.trim($("#certificate_doc").val()));
@@ -346,8 +340,6 @@ For more detailed information about how this notarization service works, please 
                     var xhrCredential = new XMLHttpRequest();
                     xhrCredential.open('post', 'http://35.237.177.17:8000/v1/credential/verify');
                     xhrCredential.responseType = 'json';
-                    xhrCredential.setRequestHeader('Authorization', 'Bearer auth-token-if-any')
-                    xhrCredential.setRequestHeader('Access-Control-Allow-Origin', '*')
                     xhrCredential.setRequestHeader('accept','application/json')
                     xhrCredential.setRequestHeader('Content-Type','application/json')       
                     xhrCredential.onload = () => {
@@ -370,8 +362,6 @@ For more detailed information about how this notarization service works, please 
                     var xhrCredential = new XMLHttpRequest();
                     xhrCredential.open('post', 'http://35.237.177.17:8000/v1/credential/verify');
                     xhrCredential.responseType = 'json';
-                    xhrCredential.setRequestHeader('Authorization', 'Bearer auth-token-if-any')
-                    xhrCredential.setRequestHeader('Access-Control-Allow-Origin', '*')
                     xhrCredential.setRequestHeader('accept','application/json')
                     xhrCredential.setRequestHeader('Content-Type','application/json')       
                     xhrCredential.onload = () => {
@@ -408,8 +398,6 @@ For more detailed information about how this notarization service works, please 
             var xhr = new XMLHttpRequest();
             xhr.open('post', 'http://35.237.177.17:8000/v1/credential/send');
             xhr.responseType = 'json';
-            xhr.setRequestHeader('Authorization', 'Bearer auth-token-if-any')
-            xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
             xhr.setRequestHeader('accept','application/json')
             xhr.setRequestHeader('Content-Type','application/json')          
             xhr.onload = () => {
