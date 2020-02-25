@@ -14,7 +14,8 @@ import (
     "time"
     "os"
     "io/ioutil"
-	"net/http"
+    "net/http"
+    "github.com/rs/cors"
     "encoding/json"
     "github.com/go-openapi/strfmt"
     lib "github.com/lacchain/hashing-service/lib"
@@ -67,7 +68,7 @@ func validateHash(w http.ResponseWriter, r *http.Request) {
 
 func uploadFile(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
-    enableCors(&w)
+    //enableCors(&w)
     if r.Method == "OPTIONS" {
         w.WriteHeader(http.StatusOK)
         return
@@ -164,10 +165,22 @@ func enableCors(w *http.ResponseWriter) {
 }
 
 func setupRoutes() {
-	fmt.Println("Init Hashing Server")
-    http.HandleFunc("/upload", uploadFile)
-    http.HandleFunc("/validate", validateHash)
-    http.ListenAndServe(":9000", nil)
+    fmt.Println("Init Hashing Server")
+    mux := http.NewServeMux()
+    //http.HandleFunc("/upload", uploadFile)
+    //http.HandleFunc("/validate", validateHash)
+    //http.ListenAndServe(":9000", nil)
+    mux.HandleFunc("/upload", uploadFile)
+    mux.HandleFunc("/validate", validateHash)
+    handler := cors.New(cors.Options{
+        AllowedOrigins: []string{"*"},
+        AllowCredentials: true,
+        AllowedMethods: []string{"DELETE","POST","GET","OPTIONS"},
+        AllowedHeaders: []string{"Origin","Content-Type","Access-Control-Allow-Headers","Access-Control-Allow-Origin"},
+        // Enable Debugging for testing, consider disabling in production
+        Debug: false,
+    }).Handler(mux)
+    http.ListenAndServe(":9000", handler)
 }
 
 func createCredential(metadata *model.Metadata, contact *model.Contact)(string){
