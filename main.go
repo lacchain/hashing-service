@@ -200,7 +200,7 @@ func createCredential(metadata *model.Metadata, contact *model.Contact)(string){
         Timeout: timeout,
     }
 
-    req, err := http.NewRequest("POST", "http://localhost:8000/v1/credential",  bytes.NewBuffer(jsonValue))
+    req, err := http.NewRequest("POST", "http://localhost:8001/v1/credential",  bytes.NewBuffer(jsonValue))
     req.Header.Set("Content-type","application/json")
     req.Header.Set("accept","application/json")
 
