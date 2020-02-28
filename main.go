@@ -32,7 +32,8 @@ func main(){
     originsOk := handlers.AllowedOrigins([]string{"*"})
     methodsOk := handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "OPTIONS"})
 
-    err := http.ListenAndServeTLS(":9000", "/home/adrianpareja/certificate/server.crt", "/home/adrianpareja/certificate/server.key", handlers.CORS(originsOk, headersOk, methodsOk)(router))
+    //err := http.ListenAndServeTLS(":9000", "/home/adrianpareja/certificate/server.crt", "/home/adrianpareja/certificate/server.key", handlers.CORS(originsOk, headersOk, methodsOk)(router))
+    err := http.ListenAndServe(":9000", handlers.CORS(originsOk, headersOk, methodsOk)(router))
 
     if err != nil {
         log.Fatal("ListenAndServe: ", err)
