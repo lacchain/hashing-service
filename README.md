@@ -1,4 +1,4 @@
-# Hahing Service
+# Hashing Service
 
 This is a Service that can hash any type of file, from applications to documents and media. Hashing a file results in a unique and irreversible identifier. If this identifier is registered in an immutable network, as a blockchain ledger, the owner of the file can prove at anytime afterwards that the file was not modified.
 
